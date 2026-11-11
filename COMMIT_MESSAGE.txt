@@ -1,0 +1,10 @@
+feat: initial release of the JRU College General Information Assistant (v1.0.0)
+
+- FastAPI chat app with web page, /api/chat and /health
+- Hybrid retrieval from Step 4c (W4): Chroma MiniLM dense + BM25, RRF k=60,
+  course-code lookup and program-aware re-rank over 1,607 S1000-G chunks
+- Groq generation (qwen/qwen3.8-27b, fallback openai/gpt-oss-120b) with a
+  grounded, citation-based prompt
+- Per-visitor rate limit and JSON query logs
+- Prebuilt chroma_db (1,607 chunks, built on Colab, verified against data/chunks.jsonl)
+- Render config, model pre-download script, Colab notebook to build chroma_db

@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>JRU College General Information Assistant</title>
+<style>
+  :root { --ink:#1d2433; --muted:#5b6475; --line:#d9dee7; --bg:#f6f7f9; --accent:#1f4e8c; --card:#ffffff; }
+  * { box-sizing: border-box; }
+  body { margin:0; font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; color:var(--ink); background:var(--bg); }
+  header { background:var(--card); border-bottom:1px solid var(--line); padding:16px 20px; }
+  header h1 { margin:0; font-size:1.15rem; }
+  header p { margin:4px 0 0; color:var(--muted); font-size:.9rem; }
+  main { max-width:820px; margin:0 auto; padding:16px 16px 140px; }
+  .msg { background:var(--card); border:1px solid var(--line); border-radius:10px; padding:14px 16px; margin:12px 0; line-height:1.5; }
+  .msg.user { background:#eaf0f8; border-color:#cbd8ea; }
+  .msg .who { font-size:.75rem; text-transform:uppercase; letter-spacing:.04em; color:var(--muted); margin-bottom:6px; }
+  .msg .body { white-space:pre-wrap; }
+  .sources { margin-top:10px; font-size:.82rem; color:var(--muted); border-top:1px dashed var(--line); padding-top:8px; }
+  .sources li { margin:2px 0; }
+  .examples button { margin:4px 6px 4px 0; padding:6px 10px; border:1px solid var(--line); background:var(--card); border-radius:16px; cursor:pointer; font-size:.85rem; }
+  form { position:fixed; left:0; right:0; bottom:0; background:var(--card); border-top:1px solid var(--line); padding:12px; }
+  .row { max-width:820px; margin:0 auto; display:flex; gap:8px; }
+  textarea { flex:1; resize:none; height:52px; padding:10px; border:1px solid var(--line); border-radius:8px; font:inherit; }
+  button.send { padding:0 18px; border:0; border-radius:8px; background:var(--accent); color:#fff; font-weight:600; cursor:pointer; }
+  button.send:disabled { opacity:.6; cursor:wait; }
+  .note { max-width:820px; margin:6px auto 0; font-size:.75rem; color:var(--muted); }
+  a { color:var(--accent); }
+</style>
+</head>
+<body>
+<header>
+  <h1>JRU College General Information Assistant</h1>
+  <p>Answers come only from the official <a href="https://jru.edu/wp-content/uploads/2026/10/COL-GI-2026-2027.pdf" target="_blank" rel="noopener">College General Information, School Year 2026-2027</a>: curricula, course descriptions and prerequisites, program outcomes, faculty, the academic calendar, and school policies.</p>
+</header>
+<main id="chat">
+  <div class="msg">
+    <div class="who">Assistant</div>
+    <div class="body">Ask me about JRU college programs and policies. For example:</div>
+    <div class="examples">
+      <button type="button">What are the second-semester third-year courses of BSIT-BA?</button>
+      <button type="button">What is the prerequisite of ITC C611?</button>
+      <button type="button">When are the second-semester final exams?</button>
+      <button type="button">What GPA is needed for Magna Cum Laude?</button>
+    </div>
+  </div>
+</main>
+<form id="f">
+  <div class="row">
+    <textarea id="q" placeholder="Type your question..." maxlength="500" required></textarea>
+    <button class="send" id="send" type="submit">Ask</button>
+  </div>
+  <div class="note">This assistant can make mistakes. Check important details in the bulletin or with the Registrar. It does not know fee amounts, class schedules, or student-organization rules.</div>
+</form>
+<script>
+const chat = document.getElementById("chat"), form = document.getElementById("f"), q = document.getElementById("q"), send = document.getElementById("send");
+function add(who, text, sources) {
+  const d = document.createElement("div"); d.className = "msg" + (who === "You" ? " user" : "");
+  const w = document.createElement("div"); w.className = "who"; w.textContent = who; d.appendChild(w);
+  const b = document.createElement("div"); b.className = "body"; b.textContent = text; d.appendChild(b);
+  if (sources && sources.length) {
+    const s = document.createElement("div"); s.className = "sources"; s.textContent = "Sources (bulletin):";
+    const ul = document.createElement("ul");
+    sources.forEach(x => { const li = document.createElement("li"); li.textContent = `[${x.n}] ${x.section} - page ${x.page}`; ul.appendChild(li); });
+    s.appendChild(ul); d.appendChild(s);
+  }
+  chat.appendChild(d); window.scrollTo(0, document.body.scrollHeight); return b;
+}
+async function ask(text) {
+  add("You", text); const wait = add("Assistant", "Searching the bulletin..."); send.disabled = true;
+  try {
+    const r = await fetch("/api/chat", {method: "POST", headers: {"Content-Type": "application/json"}, body: JSON.stringify({question: text})});
+    const d = await r.json();
+    wait.parentElement.remove();
+    if (!r.ok) add("Assistant", d.detail || "Something went wrong. Please try again.");
+    else add("Assistant", d.answer, d.sources);
+  } catch (e) { wait.textContent = "The assistant could not be reached. If it was idle, it may take about a minute to wake up; please try again."; }
+  send.disabled = false;
+}
+form.addEventListener("submit", e => { e.preventDefault(); const t = q.value.trim(); if (t.length < 3) return; q.value = ""; ask(t); });
+q.addEventListener("keydown", e => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); form.requestSubmit(); } });
+document.querySelectorAll(".examples button").forEach(b => b.addEventListener("click", () => ask(b.textContent)));
+</script>
+</body>
+</html>
