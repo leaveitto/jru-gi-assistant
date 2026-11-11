@@ -1,5 +1,11 @@
 # Changelog
 
+## [1.0.1] - 2026-11-12
+### Fixed
+- Chat page: assistant answers now render the model's bold text (`**...**`) and `*` / `-` bullet lists instead of showing
+  the raw symbols. Rendering builds DOM nodes only (no `innerHTML`), so answer text cannot inject HTML. User messages and
+  the sources list are unchanged. No change to retrieval, prompts, models or answers.
+
 ## [1.0.0] - 2026-11-11
 ### Added
 - FastAPI web app with chat page (`static/index.html`), `/api/chat` and `/health`.
