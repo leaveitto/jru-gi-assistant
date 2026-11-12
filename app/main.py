@@ -15,7 +15,7 @@ from .retriever import Retriever
 
 ROOT = Path(__file__).resolve().parent.parent
 RATE_PER_MIN = int(os.environ.get("RATE_LIMIT_PER_MINUTE", "6"))   # per visitor; protects the free Groq quota
-APP_VERSION = "1.0.0"
+APP_VERSION = "1.2.0"
 
 app = FastAPI(title="JRU College General Information Assistant", version=APP_VERSION)
 _retriever = None
@@ -83,4 +83,5 @@ def chat(body: Ask, request: Request):
                usage=out["usage"], chunk_ids=[h["chunk_id"] for h in hits], **info)
     print(json.dumps(log, ensure_ascii=False), flush=True)
     return dict(answer=out["answer"], sources=sources, model=out["model"], retrieval_seconds=t_ret,
-                llm_seconds=out["llm_seconds"], bulletin_url=BULLETIN_URL, retrieval_info=info)
+                llm_seconds=out["llm_seconds"], bulletin_url=BULLETIN_URL, retrieval_info=info,
+                usage={k: (out["usage"] or {}).get(k) for k in ("prompt_tokens", "completion_tokens", "total_tokens")})

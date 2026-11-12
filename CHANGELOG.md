@@ -1,5 +1,31 @@
 # Changelog
 
+## [1.2.0] - 2026-11-12
+### Added
+- Chat history sidebar: every conversation is saved in the visitor's browser (localStorage, up to 30 chats) and listed
+  newest first with its time and number of questions. A saved chat reopens without asking the model again. "New chat"
+  starts a fresh conversation and "Clear history" removes all saved chats. On narrow screens the sidebar slides in from a
+  menu button.
+- Token meter in the header: tokens used by this browser session (sessionStorage), drawn against 8,000 tokens (the free
+  tier's per-minute limit, shown for scale only). Each answer also shows its own token count.
+- `/api/chat` now returns `usage` (`prompt_tokens`, `completion_tokens`, `total_tokens`) as reported by Groq.
+### Changed
+- Header shows the title of the open chat; brand moved to the sidebar. `APP_VERSION` set to 1.2.0.
+### Unchanged
+- Retrieval, prompt, models and answers. Saved chats and answer text are still rendered with DOM nodes only (no `innerHTML`).
+
+## [1.1.0] - 2026-11-12
+### Changed
+- Chat page redesigned in the JRU colors (navy #142E66, gold #F2AD00, off-white #F8F8FA): navy header with a gold rule,
+  a welcome card with topic tags and example questions, chat bubbles (questions right, answers left), an animated
+  "Searching the bulletin..." indicator, sources in a collapsible list with page tags, a rounded input bar that grows with
+  the text, clearer error messages, and a layout that adapts to phones.
+- Answer text is still rendered with DOM nodes only (no `innerHTML`). Keyboard focus is visible, and motion is reduced when
+  the device asks for it.
+- `APP_VERSION` set to 1.1.0 (reported by `/health`).
+### Unchanged
+- Retrieval, prompt, models and the `/api/chat` response format. Answers are the same as in 1.0.1.
+
 ## [1.0.1] - 2026-11-12
 ### Fixed
 - Chat page: assistant answers now render the model's bold text (`**...**`) and `*` / `-` bullet lists instead of showing

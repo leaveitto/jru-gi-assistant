@@ -1,7 +1,11 @@
-Render bold text and bullet lists in chat answers (v1.0.1)
+Add chat history sidebar and session token meter (v1.2.0)
 
-The smoke test showed raw Markdown symbols in answers (for example
-**April 5-7, 2027** and "* ITC C304 ..."). The chat page now renders
-**bold** and "*"/"-" bullet lines with DOM nodes only (no innerHTML),
-so answer text cannot inject HTML. Retrieval, prompts, models and
-answers are unchanged.
+- Left sidebar lists past chats saved in the visitor's browser; a chat
+  reopens without a new model call. New chat and Clear history buttons;
+  slide-in sidebar on phones.
+- Header token meter for this browser session (scaled to the free tier's
+  8,000 tokens per minute), plus a token count under each answer.
+- /api/chat now returns Groq's usage (prompt, completion, total tokens).
+- APP_VERSION is now 1.2.0.
+
+Retrieval, prompt, models and answers are unchanged.
